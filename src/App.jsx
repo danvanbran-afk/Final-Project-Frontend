@@ -1,19 +1,24 @@
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar"; // <-- Import new Navbar
+import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import AlbumDetailsPage from "./pages/AlbumDetailsPage"; 
+import NotFoundPage from "./pages/NotFoundPage"; // <-- Import the 404 page
 
 function App() {
   return (
     <div className="App">
-      {/* The Navbar sits outside the Routes so it always stays on screen */}
       <Navbar /> 
 
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/albums/:albumId" element={<AlbumDetailsPage />} />
+        
+        {/* Catch-all route must always be at the bottom */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
   );
