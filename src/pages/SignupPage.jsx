@@ -3,16 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function SignupPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  // Test data is now set as the initial state!
+  const [email, setEmail] = useState("test@music.com");
+  const [password, setPassword] = useState("ReactIsAwesome123!");
+  const [username, setUsername] = useState("rockstar99");
+  
   const [errorMessage, setErrorMessage] = useState(undefined);
-  const [isLoading, setIsLoading] = useState(false); // Implementing the loader requirement
+  const [isLoading, setIsLoading] = useState(false); 
 
   const navigate = useNavigate();
 
   const handleSignupSubmit = async (e) => {
-    e.preventDefault(); // Prevents the default HTML page refresh
+    e.preventDefault(); 
     setIsLoading(true);
     setErrorMessage(undefined);
 
@@ -38,20 +40,37 @@ export default function SignupPage() {
 
       <form onSubmit={handleSignupSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         <label>Username:</label>
-        <input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+        <input 
+          type="text" 
+          name="username" 
+          value={username} 
+          onChange={(e) => setUsername(e.target.value)} 
+          required 
+        />
 
         <label>Email:</label>
-        <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input 
+          type="email" 
+          name="email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          required 
+        />
 
         <label>Password:</label>
-        <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <input 
+          type="password" 
+          name="password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          required 
+        />
 
         <button type="submit" disabled={isLoading} style={{ padding: "10px", marginTop: "10px" }}>
           {isLoading ? "Processing..." : "Sign Up"}
         </button>
       </form>
 
-      {/* Error Handling UI */}
       {errorMessage && <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>}
 
       <p style={{ marginTop: "20px" }}>Already have an account?</p>
