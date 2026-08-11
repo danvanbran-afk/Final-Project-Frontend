@@ -39,20 +39,25 @@ export default function AddReview({ albumId, refreshAlbum }) {
 
   return (
     <div className="form-container" style={{ marginTop: "30px", maxWidth: "100%" }}>
-      <h3 style={{ marginBottom: "15px", color: "#1e293b" }}>Leave a Review</h3>
+      <h3 style={{ marginBottom: "15px", color: "#f8fafc", fontSize: "1.25rem" }}>
+        Leave a Review
+      </h3>
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="rating">Rating (1 to 5):</label>
-          <input
-            id="rating"
-            type="number"
-            min="1"
-            max="5"
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            required
-          />
+          <label>Rating (1 to 5):</label>
+          <div className="rating-squares-container">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <button
+                key={num}
+                type="button"
+                className={`rating-square-btn ${rating === num ? "active" : ""}`}
+                onClick={() => setRating(num)}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="form-group">
@@ -74,7 +79,7 @@ export default function AddReview({ albumId, refreshAlbum }) {
       </form>
 
       {errorMessage && (
-        <p style={{ color: "#dc2626", textAlign: "center", marginTop: "10px", fontWeight: "500" }}>
+        <p style={{ color: "#f87171", textAlign: "center", marginTop: "10px", fontWeight: "500" }}>
           {errorMessage}
         </p>
       )}
