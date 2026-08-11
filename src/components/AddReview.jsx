@@ -12,28 +12,23 @@ export default function AddReview({ albumId, refreshAlbum }) {
     setIsLoading(true);
     setErrorMessage(undefined);
 
-    // Grab the token from localStorage
     const storedToken = localStorage.getItem("authToken");
 
     const requestBody = {
       content,
-      rating,
+      rating: Number(rating),
       albumId,
     };
 
     try {
-      // POST request with the authorization header
       await axios.post(
         "http://localhost:5005/api/reviews",
         requestBody,
         { headers: { Authorization: `Bearer ${storedToken}` } }
       );
 
-      // Clear the form fields on success
       setContent("");
       setRating(5);
-      
-      // Tell the parent component to fetch the updated album data
       refreshAlbum();
     } catch {
       setErrorMessage("Failed to post your review. Please try again.");
@@ -43,35 +38,46 @@ export default function AddReview({ albumId, refreshAlbum }) {
   };
 
   return (
-    <div style={{ marginTop: "30px", padding: "20px", backgroundColor: "#f4f4f4", borderRadius: "8px" }}>
-      <h3>Leave a Review</h3>
-      
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <label>Rating (1-5):</label>
-        <input 
-          type="number" 
-          min="1" 
-          max="5" 
-          value={rating} 
-          onChange={(e) => setRating(Number(e.target.value))} 
-          required 
-        />
+    <div className="form-container" style={{ marginTop: "30px", maxWidth: "100%" }}>
+      <h3 style={{ marginBottom: "15px", color: "#1e293b" }}>Leave a Review</h3>
 
-        <label>Review:</label>
-        <textarea 
-          rows="4" 
-          value={content} 
-          onChange={(e) => setContent(e.target.value)} 
-          required 
-          style={{ resize: "vertical" }}
-        />
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="rating">Rating (1 to 5):</label>
+          <input
+            id="rating"
+            type="number"
+            min="1"
+            max="5"
+            value={rating}
+            onChange={(e) => setRating(Number(e.target.value))}
+            required
+          />
+        </div>
 
-        <button type="submit" disabled={isLoading} style={{ padding: "10px", marginTop: "10px", cursor: "pointer" }}>
-          {isLoading ? "Submitting..." : "Submit Review"}
+        <div className="form-group">
+          <label htmlFor="content">Your Review:</label>
+          <textarea
+            id="content"
+            rows="4"
+            placeholder="What did you think of this album?"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
+            style={{ resize: "vertical" }}
+          />
+        </div>
+
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          {isLoading ? "Submitting Review..." : "Submit Review"}
         </button>
       </form>
 
-      {errorMessage && <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>}
+      {errorMessage && (
+        <p style={{ color: "#dc2626", textAlign: "center", marginTop: "10px", fontWeight: "500" }}>
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }

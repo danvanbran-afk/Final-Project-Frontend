@@ -1,65 +1,61 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
 
-function AuthProviderWrapper(props) {
+function AuthProviderWrapper({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  // 1. Save the token to the browser's local storage
-  const storeToken = (token) => {
-    localStorage.setItem("authToken", token);
-  };
-
-  // 2. Check if there's a token, and verify it with the backend
-  const authenticateUser = async () => {
+  const authenticateUser = useCallback(async () => {
+    // 1. Grab the token from localStorage
     const storedToken = localStorage.getItem("authToken");
 
-    if (storedToken) {
-      // We must hit our Express API to ensure the token isn't expired or fake
-      try {
-        const response = await axios.get("http://localhost:5005/api/auth/verify", {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        });
-        // Token is valid!
-        const user = response.data;
-        setIsLoggedIn(true);
-        setIsLoading(false);
-        setUser(user);
-      } catch {
-        // Token is invalid or expired
-        setIsLoggedIn(false);
-        setIsLoading(false);
-        setUser(null);
-      }
-    } else {
-      // No token found
+    // 2. If no token exists (or it's corrupted), immediately set logged-out state
+    // This prevents sending unnecessary requests that trigger 401 console errors
+    if (!storedToken || storedToken === "undefined" || storedToken === "null") {
+      setIsLoggedIn(false);
+      setIsLoading(false);
+      setUser(null);
+      return;
+    }
+
+    try {
+      // 3. Send the token to the backend verify endpoint
+      const response = await axios.get("http://localhost:5005/api/auth/verify", {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+
+      // 4. If the server responds 200 OK, update state to logged in
+      const user = response.data;
+      setIsLoggedIn(true);
+      setIsLoading(false);
+      setUser(user);
+    } catch {
+      // 5. If the server responds 401 Unauthorized (expired/invalid token):
+      // Gracefully clear the invalid token and reset state without declaring an unused variable
+      localStorage.removeItem("authToken");
       setIsLoggedIn(false);
       setIsLoading(false);
       setUser(null);
     }
-  };
-
-  // 3. Remove the token for logging out
-  const removeToken = () => {
-    localStorage.removeItem("authToken");
-  };
+  }, []);
 
   const logOutUser = () => {
-    removeToken();
-    authenticateUser(); // Resets the state
+    // Remove the token from localStorage and update state
+    localStorage.removeItem("authToken");
+    authenticateUser();
   };
 
-  // 4. Run the check once when the app first loads
+  // Run authentication check once when the application loads
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      authenticateUser();
-    }, 0);
+    const verifyAuth = async () => {
+      await authenticateUser();
+    };
 
-    return () => clearTimeout(timeoutId);
-  }, []);
+    verifyAuth();
+  }, [authenticateUser]);
 
   return (
     <AuthContext.Provider
@@ -67,14 +63,13 @@ function AuthProviderWrapper(props) {
         isLoggedIn,
         isLoading,
         user,
-        storeToken,
         authenticateUser,
         logOutUser,
       }}
     >
-      {props.children}
+      {children}
     </AuthContext.Provider>
   );
 }
 
-export { AuthContext, AuthProviderWrapper };
+export { AuthProviderWrapper, AuthContext };

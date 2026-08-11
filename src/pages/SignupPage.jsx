@@ -3,31 +3,27 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function SignupPage() {
-  // Test data is now set as the initial state!
-  const [email, setEmail] = useState("test@music.com");
-  const [password, setPassword] = useState("ReactIsAwesome123!");
-  const [username, setUsername] = useState("rockstar99");
-  
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(undefined);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSignupSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setIsLoading(true);
     setErrorMessage(undefined);
 
-    const requestBody = { email, password, username };
+    const requestBody = { username, email, password };
 
     try {
-      // Hit your Express backend
       await axios.post("http://localhost:5005/api/auth/signup", requestBody);
-      // If successful, redirect to the login page
       navigate("/login");
     } catch (error) {
-      // If the server rejects the request (e.g., email already exists)
-      const errorDescription = error.response?.data?.message || "Something went wrong";
+      const errorDescription =
+        error.response?.data?.message || "Failed to create account. Please try again.";
       setErrorMessage(errorDescription);
     } finally {
       setIsLoading(false);
@@ -35,46 +31,70 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
-      <h2>Sign Up</h2>
+    <div style={{ padding: "10px" }}>
+      <div className="form-container">
+        <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#1e293b" }}>
+          Create an Account
+        </h2>
 
-      <form onSubmit={handleSignupSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <label>Username:</label>
-        <input 
-          type="text" 
-          name="username" 
-          value={username} 
-          onChange={(e) => setUsername(e.target.value)} 
-          required 
-        />
+        <form onSubmit={handleSignupSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              placeholder="e.g., musiclover99"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
 
-        <label>Email:</label>
-        <input 
-          type="email" 
-          name="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
-        />
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <label>Password:</label>
-        <input 
-          type="password" 
-          name="password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          required 
-        />
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="Create a secure password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <button type="submit" disabled={isLoading} style={{ padding: "10px", marginTop: "10px" }}>
-          {isLoading ? "Processing..." : "Sign Up"}
-        </button>
-      </form>
+          <button type="submit" className="btn-primary" disabled={isLoading}>
+            {isLoading ? "Creating Account..." : "Sign Up"}
+          </button>
+        </form>
 
-      {errorMessage && <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>}
+        {errorMessage && (
+          <p style={{ color: "#dc2626", textAlign: "center", marginTop: "15px", fontWeight: "500" }}>
+            {errorMessage}
+          </p>
+        )}
 
-      <p style={{ marginTop: "20px" }}>Already have an account?</p>
-      <Link to="/login">Login here</Link>
+        <p style={{ textAlign: "center", marginTop: "20px", color: "#64748b" }}>
+          Already have an account?{" "}
+          <Link to="/login" style={{ color: "#4f46e5", fontWeight: "600" }}>
+            Log in here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

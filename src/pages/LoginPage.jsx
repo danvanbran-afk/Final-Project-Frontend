@@ -10,8 +10,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  // Consume our context functions
-  const { storeToken, authenticateUser } = useContext(AuthContext);
+  const { authenticateUser } = useContext(AuthContext);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -21,21 +20,22 @@ export default function LoginPage() {
     const requestBody = { email, password };
 
     try {
-      const response = await axios.post("http://localhost:5005/api/auth/login", requestBody);
-      
-      // 1. Grab the token from the backend response
-      const token = response.data.authToken;
-      
-      // 2. Save it to localStorage
-      storeToken(token);
-      
-      // 3. Verify it and update the global state
+      const response = await axios.post(
+        "http://localhost:5005/api/auth/login",
+        requestBody
+      );
+
+      // Save the JWT token in localStorage
+      localStorage.setItem("authToken", response.data.authToken);
+
+      // Verify the token and update global auth state
       await authenticateUser();
-      
-      // 4. Redirect to the homepage
+
+      // Redirect to home page
       navigate("/");
     } catch (error) {
-      const errorDescription = error.response?.data?.message || "Invalid credentials";
+      const errorDescription =
+        error.response?.data?.message || "Unable to log in. Please check your credentials.";
       setErrorMessage(errorDescription);
     } finally {
       setIsLoading(false);
@@ -43,26 +43,57 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
-      <h2>Log In</h2>
+    <div style={{ padding: "10px" }}>
+      <div className="form-container">
+        <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#1e293b" }}>
+          Log In
+        </h2>
 
-      <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <label>Email:</label>
-        <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <form onSubmit={handleLoginSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <label>Password:</label>
-        <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <button type="submit" disabled={isLoading} style={{ padding: "10px", marginTop: "10px" }}>
-          {isLoading ? "Authenticating..." : "Log In"}
-        </button>
-      </form>
+          <button type="submit" className="btn-primary" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Log In"}
+          </button>
+        </form>
 
-      {/* Error Handling UI */}
-      {errorMessage && <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>}
+        {errorMessage && (
+          <p style={{ color: "#dc2626", textAlign: "center", marginTop: "15px", fontWeight: "500" }}>
+            {errorMessage}
+          </p>
+        )}
 
-      <p style={{ marginTop: "20px" }}>Don't have an account yet?</p>
-      <Link to="/signup">Sign up here</Link>
+        <p style={{ textAlign: "center", marginTop: "20px", color: "#64748b" }}>
+          Don't have an account yet?{" "}
+          <Link to="/signup" style={{ color: "#4f46e5", fontWeight: "600" }}>
+            Sign up here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
