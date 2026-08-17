@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function AddReview({ albumId, refreshAlbum }) {
-  const [content, setContent] = useState("");
+  const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,20 +14,20 @@ export default function AddReview({ albumId, refreshAlbum }) {
 
     const storedToken = localStorage.getItem("authToken");
 
+    // The backend expects "comment" and "rating"
     const requestBody = {
-      content,
-      rating: Number(rating),
-      albumId,
+      comment: comment,
+      rating: Number(rating)
     };
 
     try {
       await axios.post(
-        "http://localhost:5005/api/reviews",
+        `http://localhost:5005/api/reviews/${albumId}`,
         requestBody,
         { headers: { Authorization: `Bearer ${storedToken}` } }
       );
 
-      setContent("");
+      setComment("");
       setRating(5);
       refreshAlbum();
     } catch {
@@ -61,13 +61,13 @@ export default function AddReview({ albumId, refreshAlbum }) {
         </div>
 
         <div className="form-group">
-          <label htmlFor="content">Your Review:</label>
+          <label htmlFor="comment">Your Review:</label>
           <textarea
-            id="content"
+            id="comment"
             rows="4"
             placeholder="What did you think of this album?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
             required
             style={{ resize: "vertical" }}
           />
