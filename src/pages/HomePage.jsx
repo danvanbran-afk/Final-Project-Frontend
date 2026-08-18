@@ -12,9 +12,10 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchAlbums = async () => {
-      try {
-        const response = await axios.get("http://localhost:5005/api/albums");
-        setAlbums(response.data);
+  try {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+    const response = await axios.get(`${API_URL}/api/albums`);
+    setAlbums(response.data);
       } catch {
         setErrorMessage("Failed to load albums. Make sure the backend is running!");
       } finally {

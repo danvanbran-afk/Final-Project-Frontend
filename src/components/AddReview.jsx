@@ -14,15 +14,15 @@ export default function AddReview({ albumId, refreshAlbum }) {
 
     const storedToken = localStorage.getItem("authToken");
 
-    // The backend expects "comment" and "rating"
     const requestBody = {
       comment: comment,
       rating: Number(rating)
     };
 
     try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
       await axios.post(
-        `http://localhost:5005/api/reviews/${albumId}`,
+        `${API_URL}/api/reviews/${albumId}`,
         requestBody,
         { headers: { Authorization: `Bearer ${storedToken}` } }
       );

@@ -7,7 +7,7 @@ export default function AddAlbumPage() {
   const [artist, setArtist] = useState("");
   const [genre, setGenre] = useState("");
   const [releaseYear, setReleaseYear] = useState("");
-  const [coverImageUrl, setCoverImageUrl] = useState(""); // Added Image URL State
+  const [coverImageUrl, setCoverImageUrl] = useState(""); 
   const [errorMessage, setErrorMessage] = useState(undefined);
 
   const navigate = useNavigate();
@@ -21,11 +21,12 @@ export default function AddAlbumPage() {
       artist,
       genre,
       releaseYear: Number(releaseYear),
-      coverImageUrl: coverImageUrl || undefined // Passes default if empty
+      coverImageUrl: coverImageUrl || undefined 
     };
 
     try {
-      await axios.post("http://localhost:5005/api/albums", requestBody, {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+      await axios.post(`${API_URL}/api/albums`, requestBody, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
       navigate("/");

@@ -19,7 +19,8 @@ export default function SignupPage() {
     const requestBody = { username, email, password };
 
     try {
-      await axios.post("http://localhost:5005/api/auth/signup", requestBody);
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+      await axios.post(`${API_URL}/api/auth/signup`, requestBody);
       navigate("/login");
     } catch (error) {
       const errorDescription =

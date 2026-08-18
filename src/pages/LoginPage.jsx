@@ -20,18 +20,11 @@ export default function LoginPage() {
     const requestBody = { email, password };
 
     try {
-      const response = await axios.post(
-        "http://localhost:5005/api/auth/login",
-        requestBody
-      );
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+      const response = await axios.post(`${API_URL}/api/auth/login`, requestBody);
 
-      // Save the JWT token in localStorage
       localStorage.setItem("authToken", response.data.authToken);
-
-      // Verify the token and update global auth state
       await authenticateUser();
-
-      // Redirect to home page
       navigate("/");
     } catch (error) {
       const errorDescription =

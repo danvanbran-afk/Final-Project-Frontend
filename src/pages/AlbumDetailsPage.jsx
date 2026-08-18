@@ -25,9 +25,10 @@ export default function AlbumDetailsPage() {
       }
 
       try {
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
         const [albumResponse, reviewsResponse] = await Promise.all([
-          axios.get(`http://localhost:5005/api/albums/${actualId}`),
-          axios.get(`http://localhost:5005/api/reviews/${actualId}`)
+          axios.get(`${API_URL}/api/albums/${actualId}`),
+          axios.get(`${API_URL}/api/reviews/${actualId}`)
         ]);
 
         setAlbum(albumResponse.data);
@@ -45,7 +46,8 @@ export default function AlbumDetailsPage() {
 
   const refreshAlbumDetails = async () => {
     try {
-      const reviewsResponse = await axios.get(`http://localhost:5005/api/reviews/${actualId}`);
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+      const reviewsResponse = await axios.get(`${API_URL}/api/reviews/${actualId}`);
       setReviews(reviewsResponse.data);
     } catch (err) {
       console.error("Failed to refresh album reviews.", err);
@@ -55,7 +57,8 @@ export default function AlbumDetailsPage() {
   const handleDeleteAlbum = async () => {
     const storedToken = localStorage.getItem("authToken");
     try {
-      await axios.delete(`http://localhost:5005/api/albums/${actualId}`, {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+      await axios.delete(`${API_URL}/api/albums/${actualId}`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
       navigate("/");
